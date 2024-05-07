@@ -45,4 +45,25 @@ class MovieGenreRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    // Consente di ottenere la lista di film associati ad un determinato genere,
+    // ordinando i risultati sulla base dei parametri $orderBy ed $order
+
+    public function findByGenreIdJoinedToMovie(int $genreId, array $orderBy = ['c.id' => 'ASC']): ?array
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQueryBuilder()
+            ->select('p, c')
+            ->from('App\Entity\MovieGenre', 'p')
+            ->innerJoin('p.movie', 'c')
+            ->where('p.genre = :id')
+            ->setParameter('id', $genreId);
+
+        foreach ($orderBy as $field => $direction) {
+            $query->orderBy($field, $direction);
+        }
+
+        return $query->getQuery()->getResult();
+    }
 }
