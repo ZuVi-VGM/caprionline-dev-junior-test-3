@@ -20,7 +20,6 @@ class GenresController extends AbstractController
     public function list(): JsonResponse
     {
         $genres = $this->genreRepository->findAll();
-        // dd($genres);
         $data = $this->serializer->serialize($genres, "json");
 
         return new JsonResponse($data, json: true);
