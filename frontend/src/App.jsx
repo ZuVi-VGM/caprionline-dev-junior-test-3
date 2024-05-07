@@ -4,11 +4,31 @@ import { Button, Rating, Spinner } from 'flowbite-react';
 const App = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [orderBy, setOrder] = useState('');
+  const [genres, setGenres] = useState([]);
+  const [filter, setFilter] = useState('');
+
+  const updateOrder = (e) => {
+    const selected = e.target.value; 
+    setOrder(selected); //TODO: simplify
+  };
+
+  const updateFilter = (e) => {
+    const selected = e.target.value;
+    setFilter(selected); //TODO: simplify
+  };
 
   const fetchMovies = () => {
     setLoading(true);
 
-    return fetch('http://localhost:8000/movies')
+    let resource = '';
+
+    if(orderBy !== '')
+      resource += '/'+orderBy;
+    if(filter !== '')
+      resource = '/'+filter+resource;
+
+    return fetch('http://localhost:8000/movies'+resource)
       .then(response => response.json())
       .then(data => {
         setMovies(data);
@@ -16,13 +36,28 @@ const App = props => {
       });
   }
 
+  const fetchGenres = () => {
+    return fetch('http://localhost:8000/genres')
+      .then(response => response.json())
+      .then(data => {
+        setGenres(data);
+      });
+  }
+
   useEffect(() => {
+    fetchGenres();
     fetchMovies();
   }, []);
+
+  useEffect(() => {
+    //fetch movies by current filter
+    fetchMovies();
+  }, [filter, orderBy]);
 
   return (
     <Layout>
       <Heading />
+      <Nav genres={genres} updateFilter={updateFilter} updateOrder={updateOrder}/>
 
       <MovieList loading={loading}>
         {movies.map((item, key) => (
@@ -30,7 +65,7 @@ const App = props => {
         ))}
       </MovieList>
     </Layout>
-  );
+  );  
 };
 
 const Layout = props => {
@@ -54,6 +89,31 @@ const Heading = props => {
         Explore the whole collection of movies
       </p>
     </div>
+  );
+};
+
+const Nav = ({genres, updateFilter, updateOrder}) => {
+
+  return (
+    <ul className="flex justify-end mb-4">
+      <li className="mr-3">
+      <label htmlFor="genres">Choose a Genre:</label>
+      <select id="genres" onChange={updateFilter} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" >
+        <option default value=''>-</option>
+        {genres.map((item, key) => (
+          <option key={key} value={item.id}>{item.name}</option>
+        ))}
+      </select>
+      </li>
+      <li className="mr-3" >
+        <label htmlFor="order">Order By:</label>
+        <select id="order" onChange={updateOrder} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          <option default value="">-</option>
+          <option value="release">Release</option>
+          <option value="rating">Rating</option>
+        </select>
+      </li>
+    </ul>
   );
 };
 
