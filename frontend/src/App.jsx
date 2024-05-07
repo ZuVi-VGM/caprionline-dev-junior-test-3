@@ -26,7 +26,7 @@ const App = props => {
     if(orderBy !== '')
       query += '/'+orderBy;
     if(filter !== '')
-      query = '/'+filter+query;
+      query = '/'+filter.toLowerCase()+query;
 
     return fetch('http://localhost:8000/movies'+query)
       .then(response => response.json())
@@ -98,7 +98,7 @@ const Nav = ({genres, updateFilter, updateOrder}) => {
       <select id="genres" onChange={updateFilter} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" >
         <option default value=''>-</option>
         {genres.map((item, key) => (
-          <option key={key} value={item.id}>{item.name}</option>
+          <option key={key} value={item.name}>{item.name}</option>
         ))}
       </select>
       </li>
