@@ -10,25 +10,25 @@ const App = props => {
 
   const updateOrder = (e) => {
     const selected = e.target.value; 
-    setOrder(selected); //TODO: simplify
-  };
+    setOrder(selected);
+  }
 
   const updateFilter = (e) => {
     const selected = e.target.value;
-    setFilter(selected); //TODO: simplify
-  };
+    setFilter(selected);
+  }
 
   const fetchMovies = () => {
     setLoading(true);
 
-    let resource = '';
+    let query = '';
 
     if(orderBy !== '')
-      resource += '/'+orderBy;
+      query += '/'+orderBy;
     if(filter !== '')
-      resource = '/'+filter+resource;
+      query = '/'+filter+query;
 
-    return fetch('http://localhost:8000/movies'+resource)
+    return fetch('http://localhost:8000/movies'+query)
       .then(response => response.json())
       .then(data => {
         setMovies(data);
@@ -45,12 +45,9 @@ const App = props => {
   }
 
   useEffect(() => {
-    fetchGenres();
-    fetchMovies();
-  }, []);
-
-  useEffect(() => {
-    //fetch movies by current filter
+    if(genres.length == 0)
+      fetchGenres();
+    
     fetchMovies();
   }, [filter, orderBy]);
 
